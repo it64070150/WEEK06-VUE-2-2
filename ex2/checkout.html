@@ -79,22 +79,22 @@
         <div class="container is-max-desktop p-5">
             <div class="column pt-6 pl-0 pr-0">
                 <!-- card cart component แสดงข้อมูลที่อยู่ใน Localstorage ---------------------------------------------->
-                <div class="card mb-4">
+                <div class="card mb-4" v-for="val in data_checkout" @click="data_checkout.reverse()">
                     <div class="card-content p-0">
                         <div class="media">
                             <div class="media-left">
                                 <figure class="image is-96x96">
-                                    <img src="https://images.unsplash.com/photo-1585459733441-9b415fed25b3?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=900&q=80"
+                                    <img :src="val.image"
                                         alt="Placeholder image">
                                 </figure>
                             </div>
                             <div class="media-content pt-2">
-                                <p class="is-5">(ตัวอย่าง) Lumix GH5</p>
-                                <p class="has-text-grey-light is-6">Panasonic</p>
+                                <p class="is-5">{{val.title}}</p>
+                                <p class="has-text-grey-light is-6">{{val.brand}}</p>
                                 <div style="display: flex;justify-content: space-between;">
                                     <div>
-                                        <span class="is-6 has-text-danger">44900</span>
-                                        <span>x0</span>
+                                        <span class="is-6 has-text-danger">{{val.price}} </span>
+                                        <span>x {{val.quantity}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -110,7 +110,7 @@
                 </div>
                 <div class="column is-3 has-text-right">
                     <!-- Total here ---------------------------------------- -->
-                    123 ฿
+                    {{Total}} ฿
                 </div>
             </div>
 
@@ -127,19 +127,19 @@
                 <div class="column">
                     <label class="label">Firstname</label>
                     <div class="control">
-                        <input class="input" type="text">
+                        <input class="input" type="text" v-model="fname">
                     </div>
                 </div>
                 <div class="column">
                     <label class="label">Lastname</label>
                     <div class="control">
-                        <input class="input" type="text">
+                        <input class="input" type="text" v-model="lname">
                     </div>
                 </div>
                 <div class="column">
                     <label class="label">Tel</label>
                     <div class="control">
-                        <input class="input" type="text">
+                        <input class="input" type="text" v-model="tele">
                     </div>
                 </div>
             </div>
@@ -152,7 +152,7 @@
                 <div class="column">
                     <label class="label">จังหวัด</label>
                     <div class="select">
-                        <select >
+                        <select v-model="provi">
                             <option v-for="item in province" :key="item.id" :value="item.id">
                                 {{ item.name_th }}
                             </option>
@@ -162,8 +162,8 @@
                 <div class="column">
                     <label class="label">อำเภอ</label>
                     <div class="select">
-                        <select >
-                            <option v-for="item in amphures" :key="item.id" :value="item.id">
+                        <select v-model="amphu">
+                            <option v-for="item in amphur" :key="item.id" :value="item">
                                 {{ item.name_th }}
                             </option>
                         </select>
@@ -172,8 +172,8 @@
                 <div class="column">
                     <label class="label">ตำบล</label>
                     <div class="select">
-                        <select >
-                            <option v-for="item in tambons" :key="item.id" :value="item.id">
+                        <select v-model="tamb">
+                            <option v-for="item in tambo" :key="item.id" :value="item">
                                 {{ item.name_th }}
                             </option>
                         </select>
@@ -183,7 +183,7 @@
                 <div class="column">
                     <!-- click this button to open Order modal ----------------- -->
                     <label class="label">Comfrim</label>
-                    <a @click="modal_confirm_order = !modal_confirm_order" class="button is-warning">Confirm Order</a>
+                    <a @click="modal_confirm_order = !modal_confirm_order, alertname()" class="button is-warning">Confirm Order</a>
                 </div>
 
             </div>
@@ -199,7 +199,33 @@
                         Order Table ของนักศึกษา
                         <table id='order-table' style="width: 100%;" class="table is-bordered">
                             <!-- ใส่ข้อมูลของ table ไว้ในนี้ -------------------------------------------->
-
+                            <tr>
+                                <th colspan = "4" class="has-text-centered">Order details</th>
+                            </tr>
+                            <tr>
+                                <th colspan = "2">ชื่อ:{{fname}} {{lname}}</th>
+                                <th colspan = "2">ที่อยู่:{{provi.name_th}} {{amphu.name_th}} {{tamb.name_th}}</th>
+                            </tr>
+                            <tr>
+                                <th class="has-text-centered" colspan = "4">รายการสินค้า</th>
+                            </tr>
+                            <tr>
+                                <th colspan="1">ชื่อสินค้า</th>
+                                <th colspan="1">ราคาต่อหน่วย</th>
+                                <th colspan="1">จำนวน</th>
+                                <th colspan="1">ราคารวม</th>
+                            </tr>
+                            <tr v-for="val in data_checkout">
+                                <td colspan="1">{{val.title}}</td>
+                                <td colspan="1">{{val.price}}</td>
+                                <td colspan="1">{{val.quantity}}</td>
+                                <td colspan="1">{{val.price * val.quantity}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"> </td>
+                                <th colspan="1">ราคารวมทั้งหมด</th>
+                                <th colspan="1">{{Total}}</th>
+                            </tr>
                         </table>
                     </section>
                 </div>
@@ -224,9 +250,53 @@
                     province: province, // ข้อมูลจังหวัด
                     amphures: amphures, // ข้อมูลอำเภอ
                     tambons: tambons, // ข้อมูลตำบล
+                    data_checkout:'',
+
+                    fname:null,
+                    lname:null,
+                    tele:'',
+
+                    amphu:'',
+                    provi:'',
+                    tamb:'',
                 },
+            created(){
+                let info = localStorage.getItem("cart")
+                this.data_checkout = JSON.parse(info);
+                },
+            computed:{
+                Total(){
+                    return this.data_checkout.reduce((sum, data_checkout) => {
+                    return Number(sum) + Number(data_checkout.price * data_checkout.quantity) }, 0);
+                },
+                amphur(){
+                    if(this.provi == 2){
+                        return this.amphures.filter(val=>{
+                        return val.province_id == 2
+                    })
+                    }else{
+                        return this.amphures.filter(val=>{
+                        return val.province_id == 1
+                    })
+                }
+                },
+                tambo(){
+                        return this.tambons.filter(val=>{
+                        return val.amphure_id == this.amphu.id
+                    })
+                }
                 
-            })
+            },
+            methods : {alertname(){
+                if(!this.fname || !this.lname){
+                        alert("Please enter all inputs")
+                        this.modal_confirm_order = false
+                        return
+                    }
+                
+            }
+        }   
+        })  
 
         </script>
 
